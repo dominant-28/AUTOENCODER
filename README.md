@@ -1,2 +1,73 @@
-# AUTOENCODER
-This repository contains the implementation of a Denoising Autoencoder using PyTorch. 
+# Denoising Autoencoder for Image Denoising
+
+## Overview
+
+This repository implements a **Denoising Autoencoder (DAE)** using **PyTorch** to remove Gaussian noise from images. The model is trained on the **BSDS500 dataset**, a widely used dataset in the image denoising research community. The architecture consists of an **encoder-decoder structure**, where the encoder progressively reduces the spatial dimensions of the input image, and the decoder reconstructs it back to its original size, effectively removing noise in the process.
+
+The primary goal of this project is to create an autoencoder that can effectively denoise images, making it a valuable tool for applications such as image restoration and enhancement.
+
+## Features
+
+- **Custom Dataset**: A dataset loader is implemented that loads the **BSDS500** dataset, adds Gaussian noise to the images, and prepares them for training.
+- **Convolutional Encoder-Decoder Model**: The autoencoder utilizes convolutional layers (with batch normalization) to encode and decode images, making it ideal for learning spatial hierarchies and image features.
+- **Loss Function**: The model uses **Mean Squared Error (MSE) Loss** to compare the denoised output to the clean target images.
+- **Optimized Training**: The model is trained using the **Adam optimizer** with a learning rate of 0.001 for 100 epochs.
+
+## Model Architecture
+
+The **Denoising Autoencoder** consists of two key components: the **Encoder** and the **Decoder**.
+
+### Encoder
+
+The encoder is made up of **4 convolutional layers**. Each convolutional layer progressively reduces the spatial dimensions of the input image while extracting features. The layers are:
+
+1. **Conv2D (3 -> 64 filters, 3x3 kernel)**: This layer captures basic image features and outputs a feature map with 64 channels.
+2. **Conv2D (64 -> 128 filters, 3x3 kernel)**: Expands the feature map by doubling the number of channels to 128.
+3. **Conv2D (128 -> 256 filters, 3x3 kernel)**: Further increases the feature complexity by expanding to 256 channels.
+4. **Conv2D (256 -> 512 filters, 3x3 kernel)**: The final convolutional layer that further extracts deep image features, outputting a feature map with 512 channels.
+
+Each convolutional layer is followed by **Batch Normalization** to stabilize the training process and **LeakyReLU** activations to introduce non-linearity. Additionally, **Max Pooling** layers are used to reduce the spatial dimensions of the feature maps, capturing the most important features while downsampling the input.
+
+### Decoder
+
+The decoder consists of **4 transposed convolution layers** (also known as deconvolution layers) which progressively upsample the feature map to the original image size:
+
+1. **ConvTranspose2D (512 -> 256 filters, 3x3 kernel)**: Upsamples the feature map from 512 channels to 256 channels.
+2. **ConvTranspose2D (256 -> 128 filters, 3x3 kernel)**: Further upsamples to 128 channels.
+3. **ConvTranspose2D (128 -> 64 filters, 3x3 kernel)**: Further upsamples to 64 channels.
+4. **ConvTranspose2D (64 -> 3 filters, 3x3 kernel)**: The final layer outputs an image with 3 channels (RGB) matching the original input image size.
+
+Each transposed convolution layer is followed by **Batch Normalization** and **LeakyReLU** activations. The final layer uses a **Sigmoid** activation function to ensure the output values are scaled between 0 and 1, representing valid pixel intensities.
+
+## Training the Model
+
+The model is trained for **100 epochs** using the **Mean Squared Error (MSE) Loss**, which measures the difference between the predicted (denoised) image and the clean target image. The **Adam optimizer** is used for optimization with a learning rate of 0.001. The model can be trained on either a **GPU** (if available) or **CPU**.
+
+### Training Process
+- **Epochs**: The model is trained for 100 epochs, where in each epoch, noisy images are passed through the model, and the model learns to minimize the loss between the denoised output and the clean image.
+- **Optimization**: During training, the Adam optimizer adjusts the model weights to minimize the loss, using backpropagation and gradient descent.
+
+After each epoch, the model prints the current loss value. As the training progresses, the loss should decrease, indicating that the model is learning to denoise images more effectively.
+
+## Dataset
+
+The **BSDS500 dataset** is a benchmark dataset often used for image denoising and restoration tasks. It contains a variety of natural images, ideal for training a denoising model.
+
+- The dataset consists of both **training** and **testing** images. You can download the dataset from its official source, then place it in the appropriate directory.
+- **Training Data**: This is used to train the autoencoder model, where noisy images are presented, and the model learns to generate the corresponding clean images.
+- **Testing Data**: This data is used to evaluate the model's performance by comparing the denoised images generated by the model against the clean images.
+
+## Usage
+
+Once the model is trained, you can use it to denoise new images by passing noisy images through the trained autoencoder. The model will output a cleaner version of the input image by removing the noise.
+
+To use the model for denoising, simply load the trained model, provide it with a noisy image, and it will output the denoised version.
+
+## Results
+
+After training, the Denoising Autoencoder should be capable of significantly reducing noise from input images. You will be able to visualize the improvement by comparing the noisy input images with the denoised output images. The model learns to map noisy images to their clean counterparts, as indicated by the reduction in the loss during training.
+
+The results can be assessed by observing the model’s ability to preserve important image details while effectively removing noise. The output images will have less visual distortion and clearer details compared to the noisy input.
+
+
+
